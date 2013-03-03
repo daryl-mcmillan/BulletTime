@@ -33,12 +33,12 @@ function run( canvas ) {
 	};
 	
 	var bounds = function( point ) {
-		if( point.x >= width && point.vx > 0
-			|| point.x <= 0 && point.vx < 0 ) {
+		if( point.x + r >= width && point.vx > 0
+			|| point.x - r  <= 0 && point.vx < 0 ) {
 			point.vx = -point.vx;
 		}
-		if( point.y >= height && point.vy > 0
-			|| point.y <= 0 && point.vy < 0 ) {
+		if( point.y + r >= height && point.vy > 0
+			|| point.y -r <= 0 && point.vy < 0 ) {
 			point.vy = -point.vy;
 		}
 	};
