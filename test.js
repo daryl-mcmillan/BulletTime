@@ -5,7 +5,7 @@ function run( canvas ) {
 	var ctx = canvas.getContext( "2d" );
 	
 	var points = [];
-	for( var i=0; i<40;i++ ) {
+	for( var i=0; i<10;i++ ) {
 		var point = {
 			x: Math.random() * width,
 			y: Math.random() * height,
@@ -43,6 +43,19 @@ function run( canvas ) {
 		}
 	};
 
+	var getForce = function( ratio ) {
+		var inverse, curve;
+		if( ratio < 0 ) {
+			inverse = 1 + ratio;
+			curve = inverse * inverse * inverse;
+			return curve;
+		} else {
+			inverse = 1 - ratio;
+			curve = inverse * inverse * inverse;
+			return -curve;
+		}
+	};
+	
 	var collide = function( points ) {
 		var i;
 		for( i=0; i<points.length; i++ ) {
@@ -61,9 +74,15 @@ function run( canvas ) {
 				if( len < 2 * r ) {
 					p1.collide = true;
 					p2.collide = true;
-					t = 0.2;
+					t = 0.1;
+					var ax = getForce( dx / 2 / r ) * 2;
+					var ay = getForce( dy / 2 / r ) * 2;
+					p1.vx += ax * t;
+					p1.vy += ay * t;
+					p2.vx -= ax * t;
+					p2.vy -= ay * t;
 				} else if( len < 4 * r ) {
-					t = 0.2 + 0.8 * ( len - 2 * r ) / ( 2 * r );
+					t = 0.1;
 				}
 				p1.t = Math.min( p1.t, t );
 				p2.t = Math.min( p2.t, t );
