@@ -1,7 +1,7 @@
 function run( canvas ) {
 	var width = canvas.width;
 	var height = canvas.height;
-	var r = 25;
+	var r = 15;
 	var ctx = canvas.getContext( "2d" );
 	
 	var points = [];
@@ -20,7 +20,7 @@ function run( canvas ) {
 		for( var i=0; i<points.length; i++ ) {
 			var point = points[i];
 			ctx.beginPath();
-			ctx.arc( point.x - r/2, point.y-r/2, r, r, 0, Math.PI*2, true );
+			ctx.arc( point.x - r, point.y-r, r*2, r*2, 0, Math.PI*2, true );
 			ctx.closePath();
 			ctx.stroke();
 		}
