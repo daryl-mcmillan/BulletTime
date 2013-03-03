@@ -1,11 +1,11 @@
 function run( canvas ) {
 	var width = canvas.width;
 	var height = canvas.height;
-	var r = 15;
+	var r = 25;
 	var ctx = canvas.getContext( "2d" );
 	
 	var points = [];
-	for( var i=0; i<40;i++ ) {
+	for( var i=0; i<10;i++ ) {
 		var point = {
 			x: Math.random() * width,
 			y: Math.random() * height,
@@ -19,8 +19,13 @@ function run( canvas ) {
 		ctx.clearRect(0,0,width,height);
 		for( var i=0; i<points.length; i++ ) {
 			var point = points[i];
+			if( point.collide ) {
+				ctx.strokeStyle = "red";
+			} else {
+				ctx.strokeStyle = "black";
+			}
 			ctx.beginPath();
-			ctx.arc( point.x - r, point.y-r, r*2, r*2, 0, Math.PI*2, true );
+			ctx.arc( point.x, point.y, r, 0, 2*Math.PI );
 			ctx.closePath();
 			ctx.stroke();
 		}
@@ -37,6 +42,26 @@ function run( canvas ) {
 		}
 	};
 
+	var collide = function( points ) {
+		var i;
+		for( i=0; i<points.length; i++ ) {
+			points[i].collide = false;
+		}
+		for( i=0; i<points.length; i++ ) {
+			var p1 = points[i];
+			for( var j=i+1; j<points.length; j++ ) {
+				var p2 = points[j];
+				var dx = p2.x-p1.x;
+				var dy = p2.y-p1.y;
+				var len = Math.sqrt( dx*dx + dy*dy );
+				if( len < 2 * r ) {
+					p1.collide = true;
+					p2.collide = true;
+				}
+			}
+		}
+	};
+	
 	var animate = function( points ) {
 		for( var i=0; i<points.length; i++ ) {
 			var point = points[i];
@@ -44,6 +69,7 @@ function run( canvas ) {
 			point.y += point.vy;
 			bounds( point );
 		}
+		collide( points );
 	}
 	
 	var processFrame = function() {
