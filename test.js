@@ -5,12 +5,13 @@ function run( canvas ) {
 	var ctx = canvas.getContext( "2d" );
 	
 	var points = [];
-	for( var i=0; i<10;i++ ) {
+	for( var i=0; i<40;i++ ) {
 		var point = {
 			x: Math.random() * width,
 			y: Math.random() * height,
-			vx: Math.random() * 2 - 1,
-			vy: Math.random() * 2 - 1
+			vx: Math.random() * 6 - 3,
+			vy: Math.random() * 6 - 3,
+			t: 1
 		};
 		points.push( point );
 	}
@@ -45,7 +46,9 @@ function run( canvas ) {
 	var collide = function( points ) {
 		var i;
 		for( i=0; i<points.length; i++ ) {
-			points[i].collide = false;
+			var point = points[i];
+			point.collide = false;
+			point.t = 1;
 		}
 		for( i=0; i<points.length; i++ ) {
 			var p1 = points[i];
@@ -54,22 +57,28 @@ function run( canvas ) {
 				var dx = p2.x-p1.x;
 				var dy = p2.y-p1.y;
 				var len = Math.sqrt( dx*dx + dy*dy );
+				var t = 1;
 				if( len < 2 * r ) {
 					p1.collide = true;
 					p2.collide = true;
+					t = 0.2;
+				} else if( len < 4 * r ) {
+					t = 0.2 + 0.8 * ( len - 2 * r ) / ( 2 * r );
 				}
+				p1.t = Math.min( p1.t, t );
+				p2.t = Math.min( p2.t, t );
 			}
 		}
 	};
 	
 	var animate = function( points ) {
+		collide( points );
 		for( var i=0; i<points.length; i++ ) {
 			var point = points[i];
-			point.x += point.vx;
-			point.y += point.vy;
 			bounds( point );
+			point.x += point.vx * point.t;
+			point.y += point.vy * point.t;
 		}
-		collide( points );
 	}
 	
 	var processFrame = function() {
