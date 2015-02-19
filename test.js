@@ -82,8 +82,11 @@ function run( canvas ) {
 				}
 		  });
 		  point.collide = nearest < 2 * r;
-		  if( nearest < 4 * r ) {
+		  nearest = nearest / r;
+		  if( nearest < 3 ) {
 		    point.t = 0.1;
+		  } else if( nearest < 5 ) {
+		    point.t = ( nearest - 3 ) / 2 * 0.9 + 0.1;
 		  } else {
 		    point.t = 1.0;
 		  }
