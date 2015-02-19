@@ -90,18 +90,17 @@ function run( canvas ) {
 		  } else {
 		    point.t = 1.0;
 		  }
+		  applyBounds( point );
 		});
 	};
 
 	var animate = function( points ) {
 		applyCollisions( points );
-		for( var i=0; i<points.length; i++ ) {
-			var point = points[i];
-			applyBounds( point );
+		each( points, function( point ) {
 			point.x += point.vx * point.t;
 			point.y += point.vy * point.t;
-		}
-	}
+		});
+	};
 
 	var processFrame = function() {
 		animate( points );
