@@ -1,9 +1,16 @@
 function run( canvas ) {
+
+  var each = function( list, action ) {
+    for( var i=0; i<list.length; i++ ) {
+      action( list[i] );
+    }
+  };
+
 	var width = canvas.width;
 	var height = canvas.height;
 	var r = 25;
 	var ctx = canvas.getContext( "2d" );
-	
+
 	var points = [];
 	for( var i=0; i<10;i++ ) {
 		var point = {
@@ -15,11 +22,10 @@ function run( canvas ) {
 		};
 		points.push( point );
 	}
-	
+
 	var draw = function( ctx, points ) {
 		ctx.clearRect(0,0,width,height);
-		for( var i=0; i<points.length; i++ ) {
-			var point = points[i];
+		each( points, function( point ) {
 			if( point.collide ) {
 				ctx.strokeStyle = "red";
 			} else {
@@ -29,10 +35,10 @@ function run( canvas ) {
 			ctx.arc( point.x, point.y, r, 0, 2*Math.PI );
 			ctx.closePath();
 			ctx.stroke();
-		}
+		});
 	};
-	
-	var bounds = function( point ) {
+
+	var applyBounds = function( point ) {
 		if( point.x + r >= width && point.vx > 0
 			|| point.x - r  <= 0 && point.vx < 0 ) {
 			point.vx = -point.vx;
@@ -55,56 +61,50 @@ function run( canvas ) {
 			return -curve;
 		}
 	};
-	
-	var collide = function( points ) {
+
+	var applyCollisions = function( points ) {
 		var i;
-		for( i=0; i<points.length; i++ ) {
-			var point = points[i];
-			point.collide = false;
-			point.t = 1;
-		}
-		for( i=0; i<points.length; i++ ) {
-			var p1 = points[i];
-			for( var j=i+1; j<points.length; j++ ) {
-				var p2 = points[j];
-				var dx = p2.x-p1.x;
-				var dy = p2.y-p1.y;
+		each( points, function( point ) {
+		  var nearest = 100000;
+		  each( points, function( other ) {
+		    if( point === other ) {
+		      return;
+		    }
+				var dx = other.x-point.x;
+				var dy = other.y-point.y;
 				var len = Math.sqrt( dx*dx + dy*dy );
-				var t = 1;
+				nearest = Math.min( nearest, len );
 				if( len < 2 * r ) {
-					p1.collide = true;
-					p2.collide = true;
-					t = 0.1;
-					var ax = getForce( dx / 2 / r ) * 2;
-					var ay = getForce( dy / 2 / r ) * 2;
-					p1.vx += ax * t;
-					p1.vy += ay * t;
-					p2.vx -= ax * t;
-					p2.vy -= ay * t;
-				} else if( len < 4 * r ) {
-					t = 0.1;
+					var ax = getForce( dx / 2 / r ) * 0.2;
+					var ay = getForce( dy / 2 / r ) * 0.2;
+					point.vx += ax;
+					point.vy += ay;
 				}
-				p1.t = Math.min( p1.t, t );
-				p2.t = Math.min( p2.t, t );
-			}
-		}
+		  });
+		  point.collide = nearest < 2 * r;
+		  if( nearest < 4 * r ) {
+		    point.t = 0.1;
+		  } else {
+		    point.t = 1.0;
+		  }
+		});
 	};
-	
+
 	var animate = function( points ) {
-		collide( points );
+		applyCollisions( points );
 		for( var i=0; i<points.length; i++ ) {
 			var point = points[i];
-			bounds( point );
+			applyBounds( point );
 			point.x += point.vx * point.t;
 			point.y += point.vy * point.t;
 		}
 	}
-	
+
 	var processFrame = function() {
 		animate( points );
 		draw( ctx, points, width, height );
 		setTimeout( processFrame, 10 );
 	};
 	processFrame();
-	
+
 }
