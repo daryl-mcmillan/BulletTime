@@ -16,8 +16,8 @@ function run( canvas ) {
 		var point = {
 			x: Math.random() * width,
 			y: Math.random() * height,
-			vx: Math.random() * 6 - 3,
-			vy: Math.random() * 6 - 3,
+			vx: Math.random() * 4 - 2,
+			vy: Math.random() * 4 - 2,
 			t: 1
 		};
 		points.push( point );
